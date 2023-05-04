@@ -19,10 +19,10 @@ compile:
 .PHONY: deploy
 deploy:
 	@echo "Desplegando contrato $(CONTRACT_NAME) en Ganache..."
-	truffle migrate --network_id 5777 --contracts_build_directory unsafe-bank/build --config unsafe-bank/truffle-config.js
-	echo $$(truffle networks | awk 'f;/^  Address: /{print $$2;f=1}' | tail -n 1) > unsafe-bank/$(CONTRACT_ADDRESS_FILE)
-	truffle networks | awk 'f;/^  ABI: /{print $$2;f=1}' | tail -n 1 > unsafe-bank/$(CONTRACT_ABI_FILE)
-	@echo "Contrato desplegado en dirección $$(cat unsafe-bank/$(CONTRACT_ADDRESS_FILE))."
+	truffle migrate --contracts_build_directory unsafe-bank/build --config unsafe-bank/truffle-config.js --network local
+#	echo $$(truffle networks | awk 'f;/^  Address: /{print $$2;f=1}' | tail -n 1) > unsafe-bank/$(CONTRACT_ADDRESS_FILE)
+#	truffle networks | awk 'f;/^  ABI: /{print $$2;f=1}' | tail -n 1 > unsafe-bank/$(CONTRACT_ABI_FILE)
+# 	@echo "Contrato desplegado en dirección $$(cat unsafe-bank/$(CONTRACT_ADDRESS_FILE))."
 
 # Ejecutar el script de Python
 .PHONY: run
