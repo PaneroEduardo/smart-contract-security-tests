@@ -1,11 +1,11 @@
 # Configuración del contrato
 CONTRACT_NAME := UnsafeBankContract
 CONTRACT_FILE := $(CONTRACT_NAME).sol
-CONTRACT_ADDRESS_FILE := $(CONTRACT_NAME).address
-CONTRACT_ABI_FILE := $(CONTRACT_NAME).abi
+DEPLOY_FOLDER := ./deploy
+CONTRACT_ADDRESS_FILE := $(DEPLOY_FOLDER)/$(CONTRACT_NAME).address
 
 # Configuración de la conexión con Ganache
-GANACHE_URL := http://localhost:7545
+GANACHE_URL := http://localhost:8545
 GANACHE_NETWORK_ID := 5777
 
 # Compilar el contrato
@@ -18,14 +18,14 @@ compile:
 # Desplegar el contrato en Ganache
 .PHONY: deploy
 deploy:
-	@echo "Desplegando contrato $(CONTRACT_NAME) en Ganache..."
+	@echo "Deploying contract $(CONTRACT_NAME) in Ganache..."
 	truffle migrate --network ganache
-	echo $$(truffle networks --network ganache | grep UnsafeBankContract | awk '{print $2}') > $(CONTRACT_ADDRESS_FILE)
-	truffle networks | awk 'f;/^  ABI: /{print $$2;f=1}' | tail -n 1 > $(CONTRACT_ABI_FILE)
-	@echo "Contrato desplegado en dirección $$(cat $(CONTRACT_ADDRESS_FILE))."
+	make get-contract-address
+	
+.PHONY: get-contract-address
+get-contract-address:
+	mkdir -p $(DEPLOY_FOLDER)
+	echo $$(truffle networks --network ganache | grep UnsafeBankContract | awk '{print $$2}') > $(CONTRACT_ADDRESS_FILE)
+	@echo "Contract deployed in $$(cat $(CONTRACT_ADDRESS_FILE))."
 
-# Ejecutar el script de Python
-.PHONY: run
-run:
-	@echo "Ejecutando script de Python..."
-	python3 script.py $(GANACHE_URL) $$(cat $(CONTRACT_ADDRESS_FILE)) bank-unsafe/$(CONTRACT_ABI_FILE)
+

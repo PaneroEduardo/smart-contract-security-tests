@@ -1,36 +1,44 @@
 from web3 import Web3
 import random
+import click
 
-ganache_url = "http://localhost:7545" 
-web3 = Web3(Web3.HTTPProvider(ganache_url))
-
-accounts = web3.eth.accounts
-print("Cuentas disponibles:", accounts)
-
-contract_address = "0x1234567890123456789012345678901234567890"
 abi = [
-    {
-        "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
     {
         "inputs": [],
         "name": "deposit",
         "outputs": [],
         "stateMutability": "payable",
-        "type": "function"
-    }
+        "type": "function",
+        "payable": True
+    },
 ]
 
-contract = web3.eth.contract(address=contract_address, abi=abi)
+def get_web3(url):
+    return Web3(Web3.HTTPProvider(url))
 
-for account in accounts:
-    value = web3.toWei(random.uniform(5, 10), "ether")
+def populate(contract_address, url):
+    web3 = get_web3(url)
+    contract = web3.eth.contract(address=contract_address, abi=abi)
+    accounts = web3.eth.accounts
 
-    tx_hash = contract.functions.deposit().transact({
-        "from": account,
-        "value": value
-    })
+    for account in accounts:
+        value = web3.toWei(random.uniform(5, 10), "ether")
 
-    tx_receipt = web3.eth.waitForTransactionReceipt(tx_hash)
+        tx_hash = contract.functions.deposit().transact({
+            "from": account,
+            "value": value
+        })
+
+        web3.eth.waitForTransactionReceipt(tx_hash)
+        print("The account {0} sent {1} ETH.".format(account, web3.fromWei(value, "ether")))
+
+
+@click.command()
+@click.option('--contract-address', prompt='Write the contract address', help='Contract address to populate')
+@click.option('--url', prompt=False, help='Url of the blockchain', default="http://localhost:7545")
+def populate_contract(contract_address, url):
+    """Script to populate the contract 'UnsafeBankContract' with a large amount of Ether"""
+    populate(contract_address, url)
+
+if __name__ == '__main__':
+    populate_contract()

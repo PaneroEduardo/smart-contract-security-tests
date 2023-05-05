@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  ganache-cli:
+    container_name: ganache-cli
+    image: trufflesuite/ganache-cli:latest
+    build:
+      context: ./ganache
+    ports:
+      - 8545:8545
+    command: "--networkId 5777"
+  
+  # populate-bank:
+  #   container_name: populate-bank
+  #   build:
+  #     context: populate_bank
+  #   depends_on:
+  #     - ganache-cli
