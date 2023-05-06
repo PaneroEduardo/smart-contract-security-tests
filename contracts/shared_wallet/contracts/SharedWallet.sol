@@ -16,38 +16,33 @@
 
 // SPDX-License-Identifier: GPL-3.0
 
-
 pragma solidity >=0.7.0 <0.9.0;
 
+contract SharedWallet{
+    mapping (address => uint) balances;
 
-//EXAMPLE OF SIMPLE BANK CONTRACT UNSAFE TO REENTRANCY
-//NOT SAFE TO REENTRANCY
-//NO MUTEX IN USE
-//UPDATES STATE AFTER MAKING EXTERNAL CALL
-contract UnsafeBankContract {
-
-    mapping(address => uint) public balances;
-
-    //Deposit temporally funds to contract
     function deposit() public payable{
-        require( msg.value > 0 );
         balances[msg.sender] += msg.value;
     }
 
-    //Request back funds
-    //NOT SAFE TO REENTRANCY
-    //NO MUTEX IN USE
-    //UPDATES STATE AFTER MAKING EXTERNAL CALL
-    function request(uint _value) public {
-        //Check enough balance
-        require(balances[msg.sender] >= _value);
+    function withdraw(uint _wei) public payable{
+        require(balances[msg.sender] >= _wei);
 
-        //Send funds
-        (bool success,) = msg.sender.call{value: _value}("");
-        require(success);
+        //Sent ether back to user
+        (bool status, ) = msg.sender.call{value: _wei}("");
+        require(status);
+        //payable(msg.sender).transfer(_wei);
 
-        //update balance
-        balances[msg.sender] -= _value;
+        //Update user balance
+        unchecked{ balances[msg.sender] -= _wei; }
+    }
+
+    function getBalance(address usuario) public view returns(uint) {
+        return balances[usuario];
+    }
+
+    function getBalance() public view returns(uint){
+        return balances[msg.sender];
     }
 
 }

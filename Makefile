@@ -1,19 +1,25 @@
 
+# Folders
+SCRIPTS_FOLDER := scripts
+CONTRACTS_FOLDER := contracts
+DEPLOY_FOLDER := deploy
+
+
 # Contract folders
-UNSAFE_BANK = ./unsafe_bank
-BANK_EXPLOIT = ./bank_exploit
+SHARED_WALLET := ./$(CONTRACTS_FOLDER)/shared_wallet
+SHARED_WALLET_EXPLOIT := ./$(CONTRACTS_FOLDER)/shared_wallet_exploit
 
 # Python script folders
-EXPLOIT_BANK = ./exploit_bank
-POPULATE_BANK = ./populate_bank
+ATTACK_SHARED_WALLET := ./$(SCRIPTS_FOLDER)/attack_shared_wallet
+POPULATE_SHARED_WALLET := ./$(SCRIPTS_FOLDER)/populate_shared_wallet
 
-DEPLOY_FOLDER = deploy
+SHARED_WALLET_CONTRACT_NAME := SharedWallet
+SHARED_WALLET_CONTRACT_ADDRESS_FILE := $(SHARED_WALLET)/$(DEPLOY_FOLDER)/$(SHARED_WALLET_CONTRACT_NAME).address
 
-UNSAFE_CONTRACT_NAME := UnsafeBankContract
-UNSAFE_CONTRACT_ADDRESS_FILE := $(UNSAFE_BANK)/$(DEPLOY_FOLDER)/$(UNSAFE_CONTRACT_NAME).address
-
-ATTACK_CONTRACT_NAME := BankExploitContract
-ATTACK_CONTRACT_ADDRESS_FILE := $(BANK_EXPLOIT)/$(DEPLOY_FOLDER)/$(ATTACK_CONTRACT_NAME).address
+SHARED_WALLET_EXPLOIT_CONTRACT_NAME := Exploit
+SHARED_WALLET_EXPLOIT_OWNER_NAME := Account
+SHARED_WALLET_EXPLOIT_ADDRESS_FILE := $(SHARED_WALLET_EXPLOIT)/$(DEPLOY_FOLDER)/$(SHARED_WALLET_EXPLOIT_CONTRACT_NAME).address
+SHARED_WALLET_EXPLOIT_OWNER_FILE := $(SHARED_WALLET_EXPLOIT)/$(DEPLOY_FOLDER)/$(SHARED_WALLET_EXPLOIT_OWNER_NAME).address
 
 GANACHE_URL := http://localhost:7545
 GANACHE_NETWORK_ID := 5777
@@ -22,37 +28,46 @@ GANACHE_NETWORK_ID := 5777
 build-environment:
 	docker-compose up -d
 	make build-populate
+	make build-attack
 	make deploy
 
 .PHONY: deploy
-deploy: deploy-unsafe-bank deploy-bank-attack
+deploy: deploy-shared-wallet deploy-shared-wallet-exploit
 
-.PHONY: deploy-unsafe-bank
-deploy-unsafe-bank:
-	@echo "Desplegando contrato $(UNSAFE_CONTRACT_NAME) en Ganache..."
-	make -C $(UNSAFE_BANK) deploy
+.PHONY: deploy-shared-wallet
+deploy-shared-wallet:
+	@echo "Desplegando contrato $(SHARED_WALLET_CONTRACT_NAME) en Ganache..."
+	make -C $(SHARED_WALLET) deploy
 
-.PHONY: deploy-bank-attack
-deploy-bank-attack:
-	@echo "Desplegando contrato $(ATTACK_CONTRACT_NAME) en Ganache..."
-	make -C $(BANK_EXPLOIT) deploy UNSAFE_CONTRACT_ADDRESS=$$(cat $(UNSAFE_CONTRACT_ADDRESS_FILE))
+.PHONY: deploy-shared-wallet-exploit
+deploy-shared-wallet-exploit:
+	@echo "Desplegando contrato $(SHARED_WALLET_EXPLOIT_CONTRACT_NAME) en Ganache... $(SHARED_WALLET_CONTRACT_ADDRESS_FILE)"
+	make -C $(SHARED_WALLET_EXPLOIT) deploy SHARED_WALLET_CONTRACT_ADDRESS=$$(cat $(SHARED_WALLET_CONTRACT_ADDRESS_FILE))
 
 .PHONY: build-populate
 build-populate:
-	@echo "Compiling populate image..."
-	make -C $(POPULATE_BANK) build
+	@echo "Compiling populate image in $(POPULATE_SHARED_WALLET)"
+	make -C $(POPULATE_SHARED_WALLET) build
 
 .PHONY: populate
 populate:
-	@echo "Compiling contract $(UNSAFE_CONTRACT_NAME)..."
-	make -C $(POPULATE_BANK) run CONTRACT_ADDRESS=$$(cat $(UNSAFE_CONTRACT_ADDRESS_FILE))
+	@echo "Compiling contract $(SHARED_WALLET_CONTRACT_NAME)..."
+	make -C $(POPULATE_SHARED_WALLET) run CONTRACT_ADDRESS=$$(cat $(SHARED_WALLET_CONTRACT_ADDRESS_FILE))
 
-.PHONY: build-exploit
-build-exploit:
+.PHONY: build-attack
+build-attack:
 	@echo "Compiling exploit image..."
-	make -C $(EXPLOIT_BANK) build
+	make -C $(ATTACK_SHARED_WALLET) build
 
-.PHONY: populate
-exploit:
-	@echo "Exploiting contract $(UNSAFE_CONTRACT_NAME)..."
-	make -C $(EXPLOIT_BANK) run CONTRACT_ADDRESS=$$(cat $(ATTACK_CONTRACT_ADDRESS_FILE))
+.PHONY: attack
+attack:
+	@echo "A contract $(SHARED_WALLET_CONTRACT_NAME)... $$(cat $(SHARED_WALLET_EXPLOIT_OWNER_FILE))"
+	make -C $(ATTACK_SHARED_WALLET) run CONTRACT_ADDRESS=$$(cat $(SHARED_WALLET_EXPLOIT_ADDRESS_FILE)) OWNER=$$(cat $(SHARED_WALLET_EXPLOIT_OWNER_FILE))
+
+.PHONY: down
+down:
+	make -C $(SHARED_WALLET) down
+	make -C $(SHARED_WALLET_EXPLOIT) down
+	make -C $(POPULATE_SHARED_WALLET) down
+	make -C $(ATTACK_SHARED_WALLET) down
+	docker-compose down

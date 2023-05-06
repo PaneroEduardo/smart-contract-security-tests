@@ -4,7 +4,7 @@ GANACHE_URL := http://ganache-cli:8545
 GANACHE_NETWORK_ID := 5777
 
 #
-DOCKER_IMAGE:=exploit_bank_script
+DOCKER_IMAGE:=attack_shared_wallet_script
 
 # Compilar el contrato
 .PHONY: build
@@ -16,8 +16,8 @@ build:
 # Desplegar el contrato en Ganache
 .PHONY: run
 run:
-	@echo "Running the exploit bank script for the contract address $(CONTRACT_ADDRESS) in $(GANACHE_URL)"
-	docker run --rm --network smart-contract-security-tests_default $(DOCKER_IMAGE)  --contract-address $(CONTRACT_ADDRESS) --url $(GANACHE_URL)
+	@echo "Running the exploit bank script for the contract address $(CONTRACT_ADDRESS) in $(GANACHE_URL) $(OWNER)"
+	docker run --rm --network smart-contract-security-tests_default $(DOCKER_IMAGE)  --contract-address $(CONTRACT_ADDRESS) --owner $(OWNER) --url $(GANACHE_URL)
 	@echo "The exploit bank finished"
 
 .PHONE: down

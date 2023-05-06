@@ -37,7 +37,7 @@ def populate(contract_address, url):
 @click.option('--contract-address', prompt='Write the contract address', help='Contract address to populate')
 @click.option('--url', prompt=False, help='Url of the blockchain', default="http://localhost:7545")
 def populate_contract(contract_address, url):
-    """Script to populate the contract 'UnsafeBankContract' with a large amount of Ether"""
+    """Script to populate the contract 'SharedWallet' with a large amount of Ether"""
     populate(contract_address, url)
 
 if __name__ == '__main__':

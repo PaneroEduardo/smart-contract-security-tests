@@ -3,8 +3,8 @@ FROM python:3.9
 WORKDIR /app
 
 COPY requirements.txt /app/requirements.txt
-COPY populate_bank.py /app/populate_bank.py
+COPY populate_shared_wallet.py /app/populate_shared_wallet.py
 
 RUN pip install -r requirements.txt
 
-ENTRYPOINT ["python", "populate_bank.py"]
+ENTRYPOINT ["python", "populate_shared_wallet.py"]
