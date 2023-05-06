@@ -24,8 +24,8 @@ SHARED_WALLET_EXPLOIT_OWNER_FILE := $(SHARED_WALLET_EXPLOIT)/$(DEPLOY_FOLDER)/$(
 GANACHE_URL := http://localhost:7545
 GANACHE_NETWORK_ID := 5777
 
-.PHONY: build-environment
-build-environment:
+.PHONY: up
+up:
 	docker-compose up -d
 	make build-populate
 	make build-attack
