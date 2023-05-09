@@ -163,3 +163,8 @@ cython_debug/
 # TRUFFLE ignore
 build/
 deploy/
+
+# JS ignore
+node_modules/
+
+.solc**

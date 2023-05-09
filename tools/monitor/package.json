@@ -1,0 +1,18 @@
+{
+  "name": "high-gas-agent",
+  "version": "0.0.1",
+  "description": "Forta Agent that detects transactions with high gas used and high gas fee",
+  "scripts": {
+    "start": "npm run start:prod",
+    "start:prod": "forta-agent run"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "bignumber.js": "^9.0.1",
+    "forta-agent": "^0.1.1"
+  },
+  "devDependencies": {
+    "jest": "^27.0.6",
+    "nodemon": "^2.0.8"
+  }
+}

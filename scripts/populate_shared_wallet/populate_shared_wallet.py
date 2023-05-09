@@ -26,7 +26,8 @@ def populate(contract_address, url):
 
         tx_hash = contract.functions.deposit().transact({
             "from": account,
-            "value": value
+            "value": value,
+            "gasPrice": web3.eth.gas_price,
         })
 
         web3.eth.waitForTransactionReceipt(tx_hash)

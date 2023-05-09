@@ -4,15 +4,15 @@ services:
   ganache-cli:
     container_name: ganache-cli
     image: trufflesuite/ganache-cli:latest
-    build:
-      context: ./ganache
     ports:
       - 8545:8545
     command: "--networkId 5777"
   
-  # populate-bank:
-  #   container_name: populate-bank
-  #   build:
-  #     context: populate_bank
-  #   depends_on:
-  #     - ganache-cli
+  monitor:
+    build: ./tools/monitor
+    environment:
+      COIN_MARKET_CAP_API: ${COIN_MARKET_CAP_API:-}
+    links:
+      - ganache-cli
+    restart: always
+
