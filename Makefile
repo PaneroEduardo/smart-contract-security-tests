@@ -3,7 +3,7 @@
 SCRIPTS_FOLDER := scripts
 CONTRACTS_FOLDER := contracts
 DEPLOY_FOLDER := deploy
-TOOLS_FOLDER := folder
+TOOLS_FOLDER := tools
 
 
 # Contract folders
@@ -38,7 +38,7 @@ up:
 	make build-populate
 	make build-attack
 	make deploy
-	make -C $(VULNERABILITIES_SCAN) up
+	make deploy-vulnerabilities-analysis-tool
 
 # Deploy contracts
 .PHONY: deploy
@@ -53,6 +53,10 @@ deploy-shared-wallet:
 deploy-shared-wallet-exploit:
 	@echo "Desplegando contrato $(SHARED_WALLET_EXPLOIT_CONTRACT_NAME) en Ganache... $(SHARED_WALLET_CONTRACT_ADDRESS_FILE)"
 	make -C $(SHARED_WALLET_EXPLOIT) deploy SHARED_WALLET_CONTRACT_ADDRESS=$$(cat $(SHARED_WALLET_CONTRACT_ADDRESS_FILE))
+
+.PHONY: deploy-vulnerabilities-analysis-tool
+deploy-vulnerabilities-analysis-tool:
+	make -C $(VULNERABILITIES_SCAN) up
 
 
 # Populate script of SharedWallet contract
@@ -85,7 +89,11 @@ scan-vulnerabilities-by-address:
 
 .PHONY: scan-vulnerabilities-by-file
 scan-vulnerabilities-by-file:
-	make -C $(VULNERABILITIES_SCAN) run-by-file NETWORK=$(DOCKER_NETWORK) URL=$(GANACHE_URL) FOLDER=$$(PWD)/$(SHARED_WALLET)/contracts FILE=$(SHARED_WALLET_CONTRACT_NAME).sol
+	make -C $(VULNERABILITIES_SCAN) mythril-run-by-file NETWORK=$(DOCKER_NETWORK) URL=$(GANACHE_URL) FOLDER=$$(PWD)/$(SHARED_WALLET)/contracts FILE=$(SHARED_WALLET_CONTRACT_NAME).sol
+
+.PHONY: securify-scan-vulnerabilities
+slither-scan-vulnerabilities:
+	make -C $(VULNERABILITIES_SCAN) slither-analysis FOLDER=$$(PWD)/$(SHARED_WALLET)/contracts FILE=$(SHARED_WALLET_CONTRACT_NAME).sol
 
 
 
