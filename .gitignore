@@ -168,3 +168,4 @@ deploy/
 node_modules/
 
 .solc**
+slither/

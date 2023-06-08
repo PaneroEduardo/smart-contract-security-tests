@@ -84,17 +84,21 @@ attack:
 
 # Scan vulnerabilities command
 .PHONY: scan-vulnerabilities-by-address
-scan-vulnerabilities-by-address:
-	make -C $(VULNERABILITIES_SCAN) run-by-address NETWORK=$(DOCKER_NETWORK)  URL=$(GANACHE_URL) CONTRACT_ADDRESS=$$(cat $(SHARED_WALLET_CONTRACT_ADDRESS_FILE))
+mythril-scan-vulnerabilities-by-address:
+	make -C $(VULNERABILITIES_SCAN) mythril-run-by-address NETWORK=$(DOCKER_NETWORK)  URL=$(GANACHE_URL) CONTRACT_ADDRESS=$$(cat $(SHARED_WALLET_CONTRACT_ADDRESS_FILE))
 
 .PHONY: scan-vulnerabilities-by-file
-scan-vulnerabilities-by-file:
+mythril-scan-vulnerabilities-by-file:
 	make -C $(VULNERABILITIES_SCAN) mythril-run-by-file NETWORK=$(DOCKER_NETWORK) URL=$(GANACHE_URL) FOLDER=$$(PWD)/$(SHARED_WALLET)/contracts FILE=$(SHARED_WALLET_CONTRACT_NAME).sol
 
 .PHONY: securify-scan-vulnerabilities
 slither-scan-vulnerabilities:
 	make -C $(VULNERABILITIES_SCAN) slither-analysis FOLDER=$$(PWD)/$(SHARED_WALLET)/contracts FILE=$(SHARED_WALLET_CONTRACT_NAME).sol
 
+# Get monitor logs
+.PHONY: monitor-logs
+get-monitor-logs:
+	docker logs smart-contract-security-tests-monitor-1
 
 
 .PHONY: down
