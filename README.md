@@ -1,4 +1,4 @@
-# Título del Proyecto
+# Smart contracts Security Tests
 
 Este repositorio forma parte del TFM titulado "Diseño y aplicación de un plan de respuesta a incidentes en redes Blockchain". El proyecto contiene una serie de scripts, contratos y herramientas relacionadas con la seguridad de contratos inteligentes en Ethereum.
 
